@@ -1,7 +1,10 @@
 import express from "express";
 import {
   createCourse,
-  getCourses,
+  getAllCourses,
+  getSingleCourse,
+  updateCourse,
+  deleteCourse,
 } from "../controllers/courseController.js";
 
 import { protect } from "../middleware/authMiddleware.js";
@@ -9,15 +12,32 @@ import { authorize } from "../middleware/roleMiddleware.js";
 
 const router = express.Router();
 
-// Public Route
-router.get("/", getCourses);
+// ======================================
+// Public Routes
+// ======================================
+router.get("/", getAllCourses);
+router.get("/:id", getSingleCourse);
 
-// Protected Route (Instructor/Admin Only)
+// ======================================
+// Protected Routes
+// ======================================
 router.post(
   "/",
   protect,
   authorize("Instructor", "Admin"),
   createCourse
+);
+router.put(
+  "/:id",
+  protect,
+  authorize("Instructor", "Admin"),
+  updateCourse
+);
+router.delete(
+  "/:id",
+  protect,
+  authorize("Instructor", "Admin"),
+  deleteCourse
 );
 
 export default router;
