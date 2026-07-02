@@ -1,0 +1,20 @@
+# Dependencies
+client/node_modules/
+server/node_modules/
+
+# Environment Variables
+server/.env
+
+# Build Output
+client/dist/
+server/dist/
+
+# Logs
+*.log
+
+# OS Files
+.DS_Store
+Thumbs.db
+
+# VS Code
+.vscode/
