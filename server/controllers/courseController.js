@@ -1,37 +1,72 @@
 import Course from "../models/Course.js";
+import cloudinary from "../config/cloudinary.js";
+import streamifier from "streamifier";
 
 // ======================================
 // Create Course
 // ======================================
 export const createCourse = async (req, res) => {
   try {
+    // Debug
+    console.log("================================");
+    console.log("BODY:", req.body);
+    console.log("FILE:", req.file);
+    console.log("USER:", req.user);
+    console.log("================================");
+
     const { title, description, category, price } = req.body;
 
+    // Validation
+    if (!title || !description || !category || !price) {
+      return res.status(400).json({
+        success: false,
+        message: "Please provide all required fields",
+      });
+    }
+
+    let thumbnail = "";
+
+    // Upload thumbnail to Cloudinary
+    if (req.file) {
+      const result = await new Promise((resolve, reject) => {
+        const uploadStream = cloudinary.uploader.upload_stream(
+          {
+            folder: "LMS/Courses",
+          },
+          (error, result) => {
+            if (error) return reject(error);
+            resolve(result);
+          }
+        );
+
+        streamifier.createReadStream(req.file.buffer).pipe(uploadStream);
+      });
+
+      thumbnail = result.secure_url;
+    }
+
+    // Create Course
     const course = await Course.create({
       title,
       description,
       category,
-      price,
+      price: Number(price),
+      thumbnail,
       instructor: req.user._id,
     });
+
+    const populatedCourse = await Course.findById(course._id).populate(
+      "instructor",
+      "name email role"
+    );
 
     res.status(201).json({
       success: true,
       message: "Course Created Successfully",
-      course: {
-        _id: course._id,
-        title: course.title,
-        description: course.description,
-        category: course.category,
-        price: course.price,
-        thumbnail: course.thumbnail,
-        instructor: course.instructor,
-        createdAt: course.createdAt,
-        updatedAt: course.updatedAt,
-      },
+      course: populatedCourse,
     });
   } catch (error) {
-    console.error(error);
+    console.error("CREATE COURSE ERROR:", error);
 
     res.status(500).json({
       success: false,
