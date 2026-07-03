@@ -11,15 +11,18 @@ const courseSchema = new mongoose.Schema(
     description: {
       type: String,
       required: true,
+      trim: true,
     },
 
     category: {
       type: String,
       required: true,
+      trim: true,
     },
 
     price: {
       type: Number,
+      required: true,
       default: 0,
     },
 
@@ -33,6 +36,14 @@ const courseSchema = new mongoose.Schema(
       ref: "User",
       required: true,
     },
+
+    // Students enrolled in this course
+    students: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+      },
+    ],
   },
   {
     timestamps: true,
