@@ -54,6 +54,7 @@ router.put(
   "/:id",
   protect,
   authorize("Instructor", "Admin"),
+  upload.single("thumbnail"),
   updateCourse
 );
 

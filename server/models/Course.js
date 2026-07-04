@@ -27,9 +27,15 @@ const courseSchema = new mongoose.Schema(
     },
 
     thumbnail: {
-      type: String,
-      default: "",
-    },
+  type: String,
+  default: "",
+},
+
+// Cloudinary Public ID (used for update/delete)
+cloudinaryId: {
+  type: String,
+  default: "",
+},
 
     instructor: {
       type: mongoose.Schema.Types.ObjectId,

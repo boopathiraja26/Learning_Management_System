@@ -1,5 +1,7 @@
 import Course from "../models/Course.js";
 import Lecture from "../models/Lecture.js";
+import cloudinary from "../config/cloudinary.js";
+import streamifier from "streamifier";
 
 // ======================================
 // Create Lecture
@@ -189,11 +191,97 @@ export const deleteLecture = async (req, res) => {
       });
     }
 
+    // Delete video from Cloudinary if it exists
+    if (lecture.cloudinaryId) {
+      await cloudinary.uploader.destroy(lecture.cloudinaryId, {
+        resource_type: "video",
+      });
+    }
+
     await lecture.deleteOne();
 
     res.status(200).json({
       success: true,
       message: "Lecture Deleted Successfully",
+    });
+  } catch (error) {
+    console.error(error);
+
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+// ======================================
+// Upload Lecture Video
+// ======================================
+export const uploadLectureVideo = async (req, res) => {
+  try {
+    const lecture = await Lecture.findById(req.params.id);
+
+    if (!lecture) {
+      return res.status(404).json({
+        success: false,
+        message: "Lecture not found",
+      });
+    }
+
+    const course = await Course.findById(lecture.course);
+
+    if (
+      course.instructor.toString() !== req.user._id.toString() &&
+      req.user.role !== "Admin"
+    ) {
+      return res.status(403).json({
+        success: false,
+        message: "You are not authorized",
+      });
+    }
+
+    if (!req.file) {
+      return res.status(400).json({
+        success: false,
+        message: "Please upload a video",
+      });
+    }
+
+    // Delete old Cloudinary video if it exists
+    if (lecture.cloudinaryId) {
+      await cloudinary.uploader.destroy(lecture.cloudinaryId, {
+        resource_type: "video",
+      });
+    }
+
+    // Upload new video
+    const result = await new Promise((resolve, reject) => {
+      const uploadStream = cloudinary.uploader.upload_stream(
+        {
+          folder: "LMS/Lectures",
+          resource_type: "video",
+        },
+        (error, result) => {
+          if (error) {
+            return reject(error);
+          }
+
+          resolve(result);
+        }
+      );
+
+      streamifier.createReadStream(req.file.buffer).pipe(uploadStream);
+    });
+
+    lecture.videoUrl = result.secure_url;
+    lecture.cloudinaryId = result.public_id;
+    lecture.duration = Math.round(result.duration);
+
+    await lecture.save();
+
+    res.status(200).json({
+      success: true,
+      message: "Lecture Video Uploaded Successfully",
+      lecture,
     });
 
   } catch (error) {

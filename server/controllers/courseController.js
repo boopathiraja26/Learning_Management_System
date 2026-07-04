@@ -7,16 +7,8 @@ import streamifier from "streamifier";
 // ======================================
 export const createCourse = async (req, res) => {
   try {
-    // Debug
-    console.log("================================");
-    console.log("BODY:", req.body);
-    console.log("FILE:", req.file);
-    console.log("USER:", req.user);
-    console.log("================================");
-
     const { title, description, category, price } = req.body;
 
-    // Validation
     if (!title || !description || !category || !price) {
       return res.status(400).json({
         success: false,
@@ -25,13 +17,15 @@ export const createCourse = async (req, res) => {
     }
 
     let thumbnail = "";
+    let cloudinaryId = "";
 
-    // Upload thumbnail to Cloudinary
+    // Upload Thumbnail
     if (req.file) {
       const result = await new Promise((resolve, reject) => {
         const uploadStream = cloudinary.uploader.upload_stream(
           {
             folder: "LMS/Courses",
+            resource_type: "image",
           },
           (error, result) => {
             if (error) return reject(error);
@@ -42,18 +36,34 @@ export const createCourse = async (req, res) => {
         streamifier.createReadStream(req.file.buffer).pipe(uploadStream);
       });
 
+      // ============================
+      // Debug
+      // ============================
+      console.log("========== CLOUDINARY ==========");
+      console.log(result);
+      console.log("Public ID :", result.public_id);
+      console.log("Secure URL:", result.secure_url);
+      console.log("================================");
+
       thumbnail = result.secure_url;
+      cloudinaryId = result.public_id;
     }
 
-    // Create Course
+    console.log("Thumbnail :", thumbnail);
+    console.log("Cloudinary ID :", cloudinaryId);
+
     const course = await Course.create({
       title,
       description,
       category,
       price: Number(price),
       thumbnail,
+      cloudinaryId,
       instructor: req.user._id,
     });
+
+    console.log("Saved Course:");
+    console.log(course);
 
     const populatedCourse = await Course.findById(course._id).populate(
       "instructor",
@@ -134,7 +144,7 @@ export const getSingleCourse = async (req, res) => {
 // ======================================
 export const updateCourse = async (req, res) => {
   try {
-    const { title, description, category, price, thumbnail } = req.body;
+    const { title, description, category, price } = req.body;
 
     const course = await Course.findById(req.params.id);
 
@@ -145,7 +155,7 @@ export const updateCourse = async (req, res) => {
       });
     }
 
-    // Check if the logged-in instructor owns this course
+    // Only owner or admin can update
     if (
       course.instructor.toString() !== req.user._id.toString() &&
       req.user.role !== "Admin"
@@ -156,22 +166,54 @@ export const updateCourse = async (req, res) => {
       });
     }
 
+    // Update basic details
     course.title = title || course.title;
     course.description = description || course.description;
     course.category = category || course.category;
     course.price = price || course.price;
-    course.thumbnail = thumbnail || course.thumbnail;
+
+    // ======================================
+    // Upload New Thumbnail (Optional)
+    // ======================================
+    if (req.file) {
+      // Delete old thumbnail from Cloudinary
+      if (course.cloudinaryId) {
+        await cloudinary.uploader.destroy(course.cloudinaryId);
+      }
+
+      // Upload new thumbnail
+      const result = await new Promise((resolve, reject) => {
+        const uploadStream = cloudinary.uploader.upload_stream(
+          {
+            folder: "LMS/Courses",
+          },
+          (error, result) => {
+            if (error) return reject(error);
+            resolve(result);
+          }
+        );
+
+        streamifier.createReadStream(req.file.buffer).pipe(uploadStream);
+      });
+
+      course.thumbnail = result.secure_url;
+      course.cloudinaryId = result.public_id;
+    }
 
     await course.save();
+
+    const updatedCourse = await Course.findById(course._id).populate(
+      "instructor",
+      "name email role"
+    );
 
     res.status(200).json({
       success: true,
       message: "Course Updated Successfully",
-      course,
+      course: updatedCourse,
     });
-
   } catch (error) {
-    console.error(error);
+    console.error("UPDATE COURSE ERROR:", error);
 
     res.status(500).json({
       success: false,

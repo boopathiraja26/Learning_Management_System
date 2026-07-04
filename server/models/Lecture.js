@@ -13,16 +13,25 @@ const lectureSchema = new mongoose.Schema(
       default: "",
     },
 
+    // Cloudinary Video URL
     videoUrl: {
       type: String,
       default: "",
     },
 
+    // Cloudinary Public ID (used for delete/update)
+    cloudinaryId: {
+      type: String,
+      default: "",
+    },
+
+    // Video Duration (in seconds)
     duration: {
       type: Number,
       default: 0,
     },
 
+    // Course Reference
     course: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Course",
