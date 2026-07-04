@@ -10,6 +10,7 @@ import courseRoutes from "./routes/courseRoutes.js";
 import lectureRoutes from "./routes/lectureRoutes.js";
 import progressRoutes from "./routes/progressRoutes.js";
 import dashboardRoutes from "./routes/dashboardRoutes.js";
+import reviewRoutes from "./routes/reviewRoutes.js";
 
 dotenv.config();
 
@@ -25,6 +26,7 @@ app.use("/api/courses", courseRoutes);
 app.use("/api/lectures", lectureRoutes);
 app.use("/api/progress", progressRoutes);
 app.use("/api/dashboard", dashboardRoutes);
+app.use("/api/reviews", reviewRoutes);
 app.get("/", (req, res) => {
   res.json({
     success: true,
