@@ -5,8 +5,21 @@ import api from "./axios";
 ========================================== */
 
 // Get all courses
-export const getAllCourses = async () => {
-  const { data } = await api.get("/courses");
+export const getAllCourses = async (
+  search = "",
+  category = "",
+  sort = "newest",
+  page = 1
+) => {
+  const { data } = await api.get("/courses", {
+    params: {
+      search,
+      category,
+      sort,
+      page,
+    },
+  });
+
   return data;
 };
 
