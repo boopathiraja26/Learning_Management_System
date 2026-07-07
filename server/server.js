@@ -16,6 +16,7 @@ import reviewRoutes from "./routes/reviewRoutes.js";
 import wishlistRoutes from "./routes/wishlistRoutes.js";
 import paymentRoutes from "./routes/paymentRoutes.js";
 import instructorRoutes from "./routes/instructorRoutes.js";
+import profileRoutes from "./routes/profileRoutes.js";
 
 
 dotenv.config();
@@ -39,6 +40,7 @@ app.use("/api/reviews", reviewRoutes);
 app.use("/api/wishlist", wishlistRoutes);
 app.use("/api/payment", paymentRoutes);
 app.use("/api/instructor", instructorRoutes);
+app.use("/api/profile", profileRoutes);
 
 // Home Route
 app.get("/", (req, res) => {

@@ -13,6 +13,7 @@ import toast from "react-hot-toast";
 
 import { deleteCourse } from "../../api/course";
 import { deleteLecture } from "../../api/lecture";
+import Loader from "../../components/common/Loader";
 
 
 const ManageCourse = () => {
@@ -99,12 +100,8 @@ const ManageCourse = () => {
 };
 
   if (loading) {
-    return (
-      <div className="text-center py-20 text-xl">
-        Loading...
-      </div>
-    );
-  }
+  return <Loader />;
+}
 
   if (!course) {
     return (

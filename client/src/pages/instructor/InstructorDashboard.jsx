@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { getInstructorDashboard } from "../../api/instructor";
+import Loader from "../../components/common/Loader";
 
 const InstructorDashboard = () => {
   const [dashboard, setDashboard] = useState(null);
@@ -25,14 +26,8 @@ const InstructorDashboard = () => {
   };
 
   if (loading) {
-    return (
-      <div className="text-center py-20">
-        <h2 className="text-2xl font-bold">
-          Loading Dashboard...
-        </h2>
-      </div>
-    );
-  }
+  return <Loader />;
+}
 
   return (
     <div className="max-w-7xl mx-auto py-8">

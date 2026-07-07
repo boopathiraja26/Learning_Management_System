@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { getAllCourses } from "../../api/course";
 import CourseCard from "../../components/course/CourseCard";
 import CourseSkeleton from "../../components/common/CourseSkeleton";
+import Loader from "../../components/common/Loader";
 
 const Courses = () => {
 

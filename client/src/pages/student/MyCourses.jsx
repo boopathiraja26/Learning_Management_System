@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { getMyCourses } from "../../api/course";
+import Loader from "../../components/common/Loader";
 
 const MyCourses = () => {
   const [courses, setCourses] = useState([]);
@@ -25,12 +26,8 @@ const MyCourses = () => {
   };
 
   if (loading) {
-    return (
-      <div className="flex justify-center items-center min-h-[400px]">
-        <h2 className="text-xl font-semibold">Loading courses...</h2>
-      </div>
-    );
-  }
+  return <Loader />;
+}
 
   return (
     <div className="max-w-7xl mx-auto">

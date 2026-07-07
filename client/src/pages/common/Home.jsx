@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { getAllCourses } from "../../api/course";
 import CourseCard from "../../components/course/CourseCard";
 import CourseSkeleton from "../../components/common/CourseSkeleton";
+import Loader from "../../components/common/Loader";
 
 const Home = () => {
   const [courses, setCourses] = useState([]);

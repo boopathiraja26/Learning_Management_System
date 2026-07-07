@@ -8,6 +8,7 @@ import {
   getCourseProgress,
   markLectureCompleted,
 } from "../../api/progress";
+import Loader from "../../components/common/Loader";  
 
 const CoursePlayer = () => {
   const { id } = useParams();
@@ -79,12 +80,8 @@ const CoursePlayer = () => {
   };
 
   if (loading) {
-    return (
-      <div className="text-center py-20 text-xl">
-        Loading...
-      </div>
-    );
-  }
+  return <Loader />;
+}
 
   return (
     <div className="max-w-7xl mx-auto py-10 px-6">

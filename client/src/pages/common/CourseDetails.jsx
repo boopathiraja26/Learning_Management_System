@@ -6,6 +6,7 @@ import { getCourseById } from "../../api/course";
 import { createOrder, verifyPayment } from "../../api/payment";
 import { useAuth } from "../../context/AuthContext";
 import CourseReviews from "../../components/course/CourseReviews";
+import Loader from "../../components/common/Loader";
 
 const CourseDetails = () => {
   const { id } = useParams();
@@ -25,6 +26,7 @@ const CourseDetails = () => {
       const res = await getCourseById(id);
       setCourse(res.course);
     } catch (error) {
+      console.error(error);
       toast.error("Failed to load course");
     } finally {
       setLoading(false);
@@ -53,7 +55,6 @@ const CourseDetails = () => {
             });
 
             toast.success(res.message);
-
             navigate("/student/my-courses");
           } catch (error) {
             toast.error(
@@ -83,13 +84,7 @@ const CourseDetails = () => {
     }
   };
 
-  if (loading) {
-    return (
-      <div className="text-center py-20 text-2xl">
-        Loading...
-      </div>
-    );
-  }
+  if (loading) return <Loader />;
 
   if (!course) {
     return (
@@ -106,26 +101,46 @@ const CourseDetails = () => {
   const alreadyEnrolled =
     isStudent &&
     course.students?.some(
-      (student) => (student._id || student) === user?._id
+      (student) =>
+        String(student._id || student) === String(user?._id)
     );
 
   const isOwner =
     isInstructor &&
-    (course.instructor?._id || course.instructor) === user?._id;
+    String(course.instructor?._id || course.instructor) ===
+      String(user?._id);
+
+  // Debug Logs
+  console.log("============== COURSE DEBUG ==============");
+  console.log("Logged User:", user);
+  console.log("Course:", course);
+  console.log("Instructor:", course.instructor);
+  console.log(
+    "Instructor ID:",
+    String(course.instructor?._id || course.instructor)
+  );
+  console.log("User ID:", String(user?._id));
+  console.log("User Role:", user?.role);
+  console.log("isInstructor:", isInstructor);
+  console.log("isOwner:", isOwner);
+  console.log("=========================================");
 
   return (
     <div className="max-w-7xl mx-auto px-6 py-10">
+
       <div className="grid md:grid-cols-2 gap-12">
+
         <img
           src={
             course.thumbnail ||
-            "https://via.placeholder.com/700x450?text=Course"
+            "https://placehold.co/700x450/png?text=Course"
           }
           alt={course.title}
-          className="rounded-xl shadow-lg w-full"
+          className="rounded-xl shadow-lg w-full h-[420px] object-cover"
         />
 
         <div>
+
           <h1 className="text-5xl font-bold mb-6">
             {course.title}
           </h1>
@@ -147,6 +162,11 @@ const CourseDetails = () => {
           <p className="mb-4 text-lg">
             <strong>Category:</strong>{" "}
             {course.category}
+          </p>
+
+          <p className="mb-8 text-lg">
+            <strong>Students:</strong>{" "}
+            {course.students?.length || 0}
           </p>
 
           <h2 className="text-5xl font-bold text-purple-700 mb-10">
@@ -182,7 +202,7 @@ const CourseDetails = () => {
               </button>
             ))}
 
-          {isAuthenticated && isOwner && (
+          {(isOwner || isAdmin) && (
             <button
               onClick={() =>
                 navigate(`/instructor/course/${course._id}`)
@@ -193,22 +213,14 @@ const CourseDetails = () => {
             </button>
           )}
 
-          {isAuthenticated && isAdmin && (
-            <button
-              onClick={() =>
-                navigate(`/instructor/course/${course._id}`)
-              }
-              className="bg-gray-800 hover:bg-gray-900 text-white px-8 py-3 rounded-lg ml-4"
-            >
-              Manage Course
-            </button>
-          )}
         </div>
+
       </div>
 
       <div className="mt-16">
         <CourseReviews courseId={course._id} />
       </div>
+
     </div>
   );
 };

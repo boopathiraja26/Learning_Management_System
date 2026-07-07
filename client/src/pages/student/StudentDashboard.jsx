@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { getStudentDashboard } from "../../api/dashboard";
+import Loader from "../../components/common/Loader";
 
 const StudentDashboard = () => {
   const [dashboard, setDashboard] = useState(null);
@@ -24,14 +25,8 @@ const StudentDashboard = () => {
   };
 
   if (loading) {
-    return (
-      <div className="text-center py-20">
-        <h2 className="text-2xl font-bold">
-          Loading Dashboard...
-        </h2>
-      </div>
-    );
-  }
+  return <Loader />;
+}
 
   return (
     <div className="max-w-7xl mx-auto py-10">

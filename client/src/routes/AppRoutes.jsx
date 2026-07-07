@@ -14,6 +14,7 @@ import Courses from "../pages/common/Courses";
 import CourseDetails from "../pages/common/CourseDetails";
 import Login from "../pages/auth/Login";
 import Register from "../pages/auth/Register";
+import NotFound from "../pages/NotFound";
 
 // Student Pages
 import StudentDashboard from "../pages/student/StudentDashboard";
@@ -124,6 +125,7 @@ const AppRoutes = () => {
             path="/instructor/course/:id"
             element={<ManageCourse />}
           />
+          <Route path="*" element={<NotFound />} />
 
         </Route>
 
