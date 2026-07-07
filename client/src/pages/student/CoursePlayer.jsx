@@ -49,8 +49,9 @@ const CoursePlayer = () => {
       const res = await getCourseProgress(id);
 
       setProgress(res.percentage || 0);
+
       setCompletedLectures(
-        res.progress?.completedLectures || []
+      res.progress?.completedLectures || []
       );
     } catch (error) {
       console.error(error);
