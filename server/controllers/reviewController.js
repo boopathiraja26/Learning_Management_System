@@ -75,9 +75,22 @@ export const getCourseReviews = async (req, res) => {
       .populate("student", "name email avatar")
       .sort({ createdAt: -1 });
 
+    const totalReviews = reviews.length;
+
+    const averageRating =
+      totalReviews === 0
+        ? 0
+        : (
+            reviews.reduce(
+              (sum, review) => sum + review.rating,
+              0
+            ) / totalReviews
+          ).toFixed(1);
+
     res.status(200).json({
       success: true,
-      totalReviews: reviews.length,
+      totalReviews,
+      averageRating,
       reviews,
     });
   } catch (error) {

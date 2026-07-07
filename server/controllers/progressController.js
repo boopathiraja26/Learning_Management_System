@@ -9,7 +9,7 @@ export const markLectureCompleted = async (req, res) => {
   try {
     const { courseId, lectureId } = req.params;
 
-    // Check course
+    // Find course
     const course = await Course.findById(courseId);
 
     if (!course) {
@@ -19,7 +19,7 @@ export const markLectureCompleted = async (req, res) => {
       });
     }
 
-    // Check lecture
+    // Find lecture
     const lecture = await Lecture.findById(lectureId);
 
     if (!lecture) {
@@ -30,7 +30,11 @@ export const markLectureCompleted = async (req, res) => {
     }
 
     // Check enrollment
-    if (!course.students.includes(req.user._id)) {
+    const isEnrolled = course.students.some(
+      (id) => id.toString() === req.user._id.toString()
+    );
+
+    if (!isEnrolled) {
       return res.status(403).json({
         success: false,
         message: "You are not enrolled in this course",
@@ -43,7 +47,7 @@ export const markLectureCompleted = async (req, res) => {
       course: courseId,
     });
 
-    // Create progress if first lecture
+    // Create if not exists
     if (!progress) {
       progress = await Progress.create({
         student: req.user._id,
@@ -52,14 +56,19 @@ export const markLectureCompleted = async (req, res) => {
       });
     }
 
-    // Prevent duplicate completion
-    if (progress.completedLectures.includes(lectureId)) {
+    // Check already completed
+    const alreadyCompleted = progress.completedLectures.some(
+      (id) => id.toString() === lectureId.toString()
+    );
+
+    if (alreadyCompleted) {
       return res.status(400).json({
         success: false,
         message: "Lecture already completed",
       });
     }
 
+    // Add lecture
     progress.completedLectures.push(lectureId);
 
     await progress.save();
@@ -72,7 +81,6 @@ export const markLectureCompleted = async (req, res) => {
 
   } catch (error) {
     console.error(error);
-
     res.status(500).json({
       success: false,
       message: error.message,
@@ -92,17 +100,18 @@ export const getCourseProgress = async (req, res) => {
       course: courseId,
     });
 
+    const totalLectures = await Lecture.countDocuments({
+      course: courseId,
+    });
+
     if (!progress) {
       return res.status(200).json({
         success: true,
         progress: 0,
         completedLectures: [],
+        totalLectures,
       });
     }
-
-    const totalLectures = await Lecture.countDocuments({
-      course: courseId,
-    });
 
     const completed = progress.completedLectures.length;
 
@@ -115,11 +124,11 @@ export const getCourseProgress = async (req, res) => {
       success: true,
       progress: percentage,
       completedLectures: progress.completedLectures,
+      totalLectures,
     });
 
   } catch (error) {
     console.error(error);
-
     res.status(500).json({
       success: false,
       message: error.message,

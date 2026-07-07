@@ -1,4 +1,5 @@
 import express from "express";
+
 import {
   addReview,
   getCourseReviews,
@@ -11,20 +12,24 @@ import { authorize } from "../middleware/roleMiddleware.js";
 
 const router = express.Router();
 
-// ======================================
-// Public Routes
-// ======================================
+/*
+========================================
+Public
+========================================
+*/
 
 // Get all reviews of a course
-router.get("/course/:courseId", getCourseReviews);
+router.get("/:courseId", getCourseReviews);
 
-// ======================================
-// Student Routes
-// ======================================
+/*
+========================================
+Student
+========================================
+*/
 
 // Add Review
 router.post(
-  "/course/:courseId",
+  "/:courseId",
   protect,
   authorize("Student"),
   addReview

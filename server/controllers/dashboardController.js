@@ -84,7 +84,9 @@ export const getInstructorDashboard = async (req, res) => {
         totalCourses,
         totalStudents,
         totalRevenue,
-        latestCourses: courses,
+        latestCourses: courses
+        .sort((a, b) => b.createdAt - a.createdAt)
+        .slice(0, 5),
       },
     });
   } catch (error) {

@@ -90,17 +90,78 @@ export const createCourse = async (req, res) => {
 // ======================================
 export const getAllCourses = async (req, res) => {
   try {
-    const courses = await Course.find()
+    // ============================
+    // Query Parameters
+    // ============================
+    const page = Number(req.query.page) || 1;
+    const limit = Number(req.query.limit) || 10;
+    const skip = (page - 1) * limit;
+
+    const search = req.query.search || "";
+    const category = req.query.category || "";
+    const sort = req.query.sort || "newest";
+
+    // ============================
+    // Build Query
+    // ============================
+    const query = {};
+
+    // Search by title
+    if (search) {
+      query.title = {
+        $regex: search,
+        $options: "i",
+      };
+    }
+
+    // Filter by category
+    if (category) {
+      query.category = category;
+    }
+
+    // ============================
+    // Sorting
+    // ============================
+    let sortOption = {};
+
+    switch (sort) {
+      case "priceLow":
+        sortOption = { price: 1 };
+        break;
+
+      case "priceHigh":
+        sortOption = { price: -1 };
+        break;
+
+      case "oldest":
+        sortOption = { createdAt: 1 };
+        break;
+
+      default:
+        sortOption = { createdAt: -1 };
+    }
+
+    // ============================
+    // Fetch Courses
+    // ============================
+    const courses = await Course.find(query)
       .populate("instructor", "name email role")
-      .select("-__v");
+      .select("-__v")
+      .sort(sortOption)
+      .skip(skip)
+      .limit(limit);
+
+    const totalCourses = await Course.countDocuments(query);
 
     res.status(200).json({
       success: true,
-      totalCourses: courses.length,
+      currentPage: page,
+      totalPages: Math.ceil(totalCourses / limit),
+      totalCourses,
       courses,
     });
   } catch (error) {
-    console.error(error);
+    console.error("GET COURSES ERROR:", error);
 
     res.status(500).json({
       success: false,

@@ -1,28 +1,28 @@
 import express from "express";
 import {
-  markLectureCompleted,
-  getCourseProgress,
-} from "../controllers/progressController.js";
+  createOrder,
+  verifyPayment,
+} from "../controllers/paymentController.js";
 
 import { protect } from "../middleware/authMiddleware.js";
 import { authorize } from "../middleware/roleMiddleware.js";
 
 const router = express.Router();
 
-// Get Progress
-router.get(
-  "/:courseId",
+// Create Razorpay Order
+router.post(
+  "/create-order/:courseId",
   protect,
   authorize("Student"),
-  getCourseProgress
+  createOrder
 );
 
-// Mark Lecture Completed
+// Verify Payment
 router.post(
-  "/:courseId/:lectureId",
+  "/verify",
   protect,
   authorize("Student"),
-  markLectureCompleted
+  verifyPayment
 );
 
 export default router;
