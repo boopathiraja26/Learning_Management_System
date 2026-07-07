@@ -4,21 +4,10 @@ import api from "./axios";
    Public Course APIs
 ========================================== */
 
-// Get all courses with search/filter/sort/pagination
-export const getAllCourses = async (
-  page = 1,
-  search = "",
-  category = "",
-  sort = "newest"
-) => {
+// Get all courses
+export const getAllCourses = async (params = {}) => {
   const { data } = await api.get("/courses", {
-    params: {
-      page,
-      limit: 9,
-      search,
-      category,
-      sort,
-    },
+    params,
   });
 
   return data;
