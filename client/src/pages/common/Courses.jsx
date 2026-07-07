@@ -1,8 +1,12 @@
 import { useEffect, useState } from "react";
 import { getAllCourses } from "../../api/course";
 import CourseCard from "../../components/course/CourseCard";
+import CourseSkeleton from "../../components/common/CourseSkeleton";
 
 const Courses = () => {
+
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
   const [courses, setCourses] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -11,28 +15,31 @@ const Courses = () => {
   const [sort, setSort] = useState("newest");
 
   useEffect(() => {
-    fetchCourses();
-  }, [search, category, sort]);
+  fetchCourses();
+}, [search, category, sort, page]);
 
   const fetchCourses = async () => {
-    try {
-      setLoading(true);
+  try {
+    setLoading(true);
 
-      const data = await getAllCourses({
-        search,
-        category,
-        sort,
-      });
+    const data = await getAllCourses({
+      search,
+      category,
+      sort,
+      page,
+      limit: 6,
+    });
 
-      if (data.success) {
-        setCourses(data.courses);
-      }
-    } catch (error) {
-      console.error(error);
-    } finally {
-      setLoading(false);
+    if (data.success) {
+      setCourses(data.courses);
+      setTotalPages(data.totalPages);
     }
-  };
+  } catch (error) {
+    console.error(error);
+  } finally {
+    setLoading(false);
+  }
+};
 
   return (
     <div className="max-w-7xl mx-auto py-10 px-6">
@@ -61,7 +68,10 @@ const Courses = () => {
           type="text"
           placeholder="🔍 Search courses..."
           value={search}
-          onChange={(e) => setSearch(e.target.value)}
+          onChange={(e) => {
+          setSearch(e.target.value);
+          setPage(1);
+          }}
           className="border border-gray-300 rounded-xl px-4 py-3 focus:ring-2 focus:ring-purple-600 outline-none"
         />
 
@@ -69,7 +79,10 @@ const Courses = () => {
 
         <select
           value={category}
-          onChange={(e) => setCategory(e.target.value)}
+          onChange={(e) => {
+          setCategory(e.target.value);
+          setPage(1);
+          }}
           className="border border-gray-300 rounded-xl px-4 py-3"
         >
           <option value="">All Categories</option>
@@ -91,7 +104,10 @@ const Courses = () => {
 
         <select
           value={sort}
-          onChange={(e) => setSort(e.target.value)}
+          onChange={(e) => {
+          setSort(e.target.value);
+          setPage(1); 
+          }}
           className="border border-gray-300 rounded-xl px-4 py-3"
         >
           <option value="newest">
@@ -118,15 +134,15 @@ const Courses = () => {
 
       {loading ? (
 
-        <div className="text-center py-20">
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
 
-          <h2 className="text-2xl font-semibold">
-            Loading Courses...
-          </h2>
+        {[...Array(6)].map((_, index) => (
+        <CourseSkeleton key={index} />
+         ))}
 
         </div>
 
-      ) : courses.length === 0 ? (
+): courses.length === 0 ? (
 
         <div className="bg-white shadow rounded-xl p-12 text-center">
 
@@ -160,6 +176,41 @@ const Courses = () => {
             ))}
 
           </div>
+          {totalPages > 1 && (
+  <div className="flex justify-center items-center gap-2 mt-12">
+
+    <button
+      disabled={page === 1}
+      onClick={() => setPage(page - 1)}
+      className="px-4 py-2 rounded-lg border disabled:opacity-40 hover:bg-gray-100"
+    >
+      Previous
+    </button>
+
+    {[...Array(totalPages)].map((_, index) => (
+      <button
+        key={index}
+        onClick={() => setPage(index + 1)}
+        className={`px-4 py-2 rounded-lg ${
+          page === index + 1
+            ? "bg-purple-700 text-white"
+            : "border hover:bg-gray-100"
+        }`}
+      >
+        {index + 1}
+      </button>
+    ))}
+
+    <button
+      disabled={page === totalPages}
+      onClick={() => setPage(page + 1)}
+      className="px-4 py-2 rounded-lg border disabled:opacity-40 hover:bg-gray-100"
+    >
+      Next
+    </button>
+
+  </div>
+)}
 
         </>
 

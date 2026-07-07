@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { getAllCourses } from "../../api/course";
 import CourseCard from "../../components/course/CourseCard";
+import CourseSkeleton from "../../components/common/CourseSkeleton";
 
 const Home = () => {
   const [courses, setCourses] = useState([]);
@@ -55,13 +56,13 @@ const Home = () => {
         </h2>
 
         {loading ? (
-          <p className="text-center text-gray-500">
-            Loading courses...
-          </p>
-        ) : courses.length === 0 ? (
-          <p className="text-center text-gray-500">
-            No courses available.
-          </p>
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+
+          {[...Array(6)].map((_, index) => (
+          <CourseSkeleton key={index} />
+          ))}
+
+          </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {courses.slice(0, 6).map((course) => (
