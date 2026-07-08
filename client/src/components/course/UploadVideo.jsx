@@ -1,7 +1,7 @@
 import { useState } from "react";
 import toast from "react-hot-toast";
 
-import { uploadLectureVideo } from "../../api/Lecture";
+import { uploadLectureVideo } from "../../api/lecture";
 
 const UploadVideo = ({ lectureId, onSuccess, onClose }) => {
   const [video, setVideo] = useState(null);
