@@ -35,33 +35,20 @@ import RoleProtectedRoute from "../components/protected/RoleProtectedRoute";
 const AppRoutes = () => {
   return (
     <BrowserRouter>
-
-      {/* Automatically scrolls to top */}
       <ScrollToTop />
 
       <Routes>
 
-        {/* ================= Public ================= */}
-
+        {/* ================= Public Routes ================= */}
         <Route element={<MainLayout />}>
-
           <Route path="/" element={<Home />} />
-
           <Route path="/courses" element={<Courses />} />
-
-          <Route
-            path="/courses/:id"
-            element={<CourseDetails />}
-          />
-
+          <Route path="/courses/:id" element={<CourseDetails />} />
           <Route path="/login" element={<Login />} />
-
           <Route path="/register" element={<Register />} />
-
         </Route>
 
-        {/* ================= Student ================= */}
-
+        {/* ================= Student Routes ================= */}
         <Route
           element={
             <ProtectedRoute>
@@ -71,36 +58,17 @@ const AppRoutes = () => {
             </ProtectedRoute>
           }
         >
-
-          <Route
-            path="/student"
-            element={<StudentDashboard />}
-          />
-
-          <Route
-            path="/student/my-courses"
-            element={<MyCourses />}
-          />
-
-          <Route
-            path="/student/wishlist"
-            element={<Wishlist />}
-          />
-
-          <Route
-            path="/student/profile"
-            element={<Profile />}
-          />
-
+          <Route path="/student" element={<StudentDashboard />} />
+          <Route path="/student/my-courses" element={<MyCourses />} />
+          <Route path="/student/wishlist" element={<Wishlist />} />
+          <Route path="/student/profile" element={<Profile />} />
           <Route
             path="/student/course/:id"
             element={<CoursePlayer />}
           />
-
         </Route>
 
-        {/* ================= Instructor ================= */}
-
+        {/* ================= Instructor Routes ================= */}
         <Route
           element={
             <ProtectedRoute>
@@ -110,7 +78,6 @@ const AppRoutes = () => {
             </ProtectedRoute>
           }
         >
-
           <Route
             path="/instructor"
             element={<InstructorDashboard />}
@@ -125,12 +92,12 @@ const AppRoutes = () => {
             path="/instructor/course/:id"
             element={<ManageCourse />}
           />
-          <Route path="*" element={<NotFound />} />
-
         </Route>
 
-      </Routes>
+        {/* ================= 404 Page ================= */}
+        <Route path="*" element={<NotFound />} />
 
+      </Routes>
     </BrowserRouter>
   );
 };
