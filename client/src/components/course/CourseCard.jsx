@@ -26,7 +26,7 @@ const getCoverImage = (course) => {
     if (lower.includes(key.toLowerCase())) return url;
   }
   // Fallback generic image
-  return "https://placehold.co/600x400?text=Course";
+  return "https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=600&q=80";
 };
 
 // Marketing title fallback – simple mapping based on category
