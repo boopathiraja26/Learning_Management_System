@@ -1,0 +1,18 @@
+/* Theme variables for premium design */
+:root {
+  --color-primary: #6366f1; /* Indigo 500 */
+  --color-primary-light: #a5b4fc; /* Indigo 300 */
+  --color-bg: #f8fafc; /* Tailwind gray-50 */
+  --color-glass: rgba(255, 255, 255, 0.15);
+  --color-glass-border: rgba(255, 255, 255, 0.2);
+  --gradient-mesh: conic-gradient(from 180deg at 50% 50%, #6366f1, #6366f1 25%, #4f46e5 50%, #4f46e5 75%, #6366f1);
+}
+
+/* Glassmorphism utility */
+.glass {
+  background: var(--color-glass);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--color-glass-border);
+  border-radius: 1rem;
+}
